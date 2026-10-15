@@ -74,3 +74,18 @@ def test_tc02_product_details(
     )
     expect(page.locator('[data-test="inventory-item-desc"]')).to_be_visible()
     snap("product_details_page")
+
+def test_tc03_add_product_to_cart(
+    logged_in_page: Page, product: dict[str, str], snap: Snap
+) -> None:
+    # `product` is parameterized in conftest.py: runs once per product in the JSON.
+    page = logged_in_page
+    add_to_cart(page, product["name"], snap)
+
+    open_cart(page, snap)
+    expect(page.locator('[data-test="inventory-item-name"]')).to_have_text(
+        product["name"]
+    )
+    expect(page.locator('[data-test="inventory-item-price"]')).to_have_text(
+        product["price"]
+    )
