@@ -28,3 +28,25 @@ def fill_customer_info(page: Page, customer: dict[str, str], snap: Snap) -> None
     page.locator('[data-test="postalCode"]').fill(customer["postal_code"])
     snap("customer_info_entered")
     page.locator('[data-test="continue"]').click()
+
+# ---------- tests ----------
+
+def test_tc01_successful_login(
+    page: Page,
+    base_url: str,
+    valid_user: dict[str, str],
+    test_data: dict[str, Any],
+    snap: Snap,
+) -> None:
+    page.goto(base_url)
+    snap("login_page")
+    page.locator('[data-test="username"]').fill(valid_user["username"])
+    page.locator('[data-test="password"]').fill(valid_user["password"])
+    snap("credentials_entered")
+    page.locator('[data-test="login-button"]').click()
+
+    expect(page).to_have_url(re.compile(r".*/inventory\.html"))
+    expect(page.locator('[data-test="title"]')).to_have_text(
+        test_data["expected"]["inventory_title"]
+    )
+    snap("products_page")
