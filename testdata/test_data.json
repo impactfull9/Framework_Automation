@@ -1,0 +1,34 @@
+{
+  "base_url": "https://www.saucedemo.com/",
+  "users": {
+    "valid": {
+      "username": "standard_user",
+      "password": "secret_sauce"
+    }
+  },
+  "customer": {
+    "first_name": "Test",
+    "last_name": "User",
+    "postal_code": "110001"
+  },
+  "products": [
+    {
+      "id": "backpack",
+      "name": "Sauce Labs Backpack",
+      "price": "$29.99"
+    },
+    {
+      "id": "bike-light",
+      "name": "Sauce Labs Bike Light",
+      "price": "$9.99"
+    }
+  ],
+  "expected": {
+    "inventory_item_count": 6,
+    "inventory_title": "Products",
+    "overview_title": "Checkout: Overview",
+    "order_complete_title": "Checkout: Complete!",
+    "order_complete_header": "Thank you for your order!"
+  }
+}
+
