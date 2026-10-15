@@ -89,3 +89,33 @@ def logged_in_page(
     expect(page).to_have_url(re.compile(r".*/inventory\.html"))
     snap("inventory_page")
     return page
+
+# ---------- logging of test results ----------
+
+def _short_reason(report: pytest.TestReport) -> str:
+    crash = getattr(report.longrepr, "reprcrash", None)
+    if crash:
+        return crash.message.splitlines()[0]
+    return str(report.longrepr)[:300]
+
+
+def pytest_runtest_logstart(nodeid: str, location: Any) -> None:
+    logger.info("START   %s", nodeid)
+
+
+def pytest_runtest_logreport(report: pytest.TestReport) -> None:
+    if report.when == "call":
+        if report.passed:
+            logger.info("PASSED  %s", report.nodeid)
+        elif report.failed:
+            logger.error(
+                "FAILED  %s | %s | screenshot and trace are in test-results/",
+                report.nodeid,
+                _short_reason(report),
+            )
+    elif report.failed:  # problem in setup or teardown
+        logger.error(
+            "ERROR   %s (%s) | %s", report.nodeid, report.when, _short_reason(report)
+        )
+    elif report.skipped and report.when == "setup":
+        logger.warning("SKIPPED %s", report.nodeid)
