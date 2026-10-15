@@ -24,3 +24,50 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if "product" in metafunc.fixturenames:
         products = _load_test_data()["products"]
         metafunc.parametrize("product", products, ids=[p["id"] for p in products])
+
+
+@pytest.fixture(scope="session")
+def test_data() -> dict[str, Any]:
+    return _load_test_data()
+
+
+@pytest.fixture(scope="session")
+def base_url(test_data: dict[str, Any]) -> str:
+    return test_data["base_url"]
+
+
+@pytest.fixture
+def valid_user(test_data: dict[str, Any]) -> dict[str, str]:
+    return test_data["users"]["valid"]
+
+
+@pytest.fixture
+def customer(test_data: dict[str, Any]) -> dict[str, str]:
+    return test_data["customer"]
+
+
+@pytest.fixture
+def default_product(test_data: dict[str, Any]) -> dict[str, str]:
+    return test_data["products"][0]
+
+
+@pytest.fixture
+def snap(page: Page, request: pytest.FixtureRequest) -> Callable[[str], None]:
+    """Call snap("label") to save a numbered full-page screenshot for this test.
+
+    Files go to screenshots/<test name>/01_label.png, 02_label.png, ...
+    """
+    folder_name = re.sub(r"[^\w.-]+", "_", request.node.name).strip("_")
+    folder = SCREENSHOT_DIR / folder_name
+    folder.mkdir(parents=True, exist_ok=True)
+    for old_file in folder.glob("*.png"):  # clear leftovers from earlier runs
+        try:
+            old_file.unlink()
+        except OSError:
+            pass  # locked by OneDrive/Explorer; it will just be overwritten
+    counter = itertools.count(1)
+
+    def _snap(label: str) -> None:
+        page.screenshot(path=str(folder / f"{next(counter):02d}_{label}.png"), full_page=True)
+
+    return _snap
