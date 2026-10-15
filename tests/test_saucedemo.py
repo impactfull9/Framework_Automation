@@ -89,3 +89,28 @@ def test_tc03_add_product_to_cart(
     expect(page.locator('[data-test="inventory-item-price"]')).to_have_text(
         product["price"]
     )
+
+def test_tc04_checkout_navigation(
+    logged_in_page: Page,
+    default_product: dict[str, str],
+    customer: dict[str, str],
+    test_data: dict[str, Any],
+    snap: Snap,
+) -> None:
+    page = logged_in_page
+    add_to_cart(page, default_product["name"], snap)
+    open_cart(page, snap)
+    page.locator('[data-test="checkout"]').click()
+    expect(page).to_have_url(re.compile(r".*/checkout-step-one\.html"))
+    snap("checkout_info_page")
+
+    fill_customer_info(page, customer, snap)
+
+    expect(page).to_have_url(re.compile(r".*/checkout-step-two\.html"))
+    expect(page.locator('[data-test="title"]')).to_have_text(
+        test_data["expected"]["overview_title"]
+    )
+    expect(page.locator('[data-test="inventory-item-name"]')).to_have_text(
+        default_product["name"]
+    )
+    snap("checkout_overview_page")
