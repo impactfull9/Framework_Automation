@@ -50,3 +50,27 @@ def test_tc01_successful_login(
         test_data["expected"]["inventory_title"]
     )
     snap("products_page")
+
+def test_tc02_product_details(
+    logged_in_page: Page,
+    default_product: dict[str, str],
+    test_data: dict[str, Any],
+    snap: Snap,
+) -> None:
+    page = logged_in_page
+    items = page.locator('[data-test="inventory-item"]')
+    expect(items).to_have_count(test_data["expected"]["inventory_item_count"])
+
+    page.locator('[data-test="inventory-item-name"]').filter(
+        has_text=default_product["name"]
+    ).click()
+
+    expect(page).to_have_url(re.compile(r".*/inventory-item\.html"))
+    expect(page.locator('[data-test="inventory-item-name"]')).to_have_text(
+        default_product["name"]
+    )
+    expect(page.locator('[data-test="inventory-item-price"]')).to_have_text(
+        default_product["price"]
+    )
+    expect(page.locator('[data-test="inventory-item-desc"]')).to_be_visible()
+    snap("product_details_page")
