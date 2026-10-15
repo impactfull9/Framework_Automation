@@ -71,3 +71,21 @@ def snap(page: Page, request: pytest.FixtureRequest) -> Callable[[str], None]:
         page.screenshot(path=str(folder / f"{next(counter):02d}_{label}.png"), full_page=True)
 
     return _snap
+
+@pytest.fixture
+def logged_in_page(
+    page: Page,
+    base_url: str,
+    valid_user: dict[str, str],
+    snap: Callable[[str], None],
+) -> Page:
+    """A page that is already logged in and sitting on the inventory page."""
+    page.goto(base_url)
+    snap("login_page")
+    page.locator('[data-test="username"]').fill(valid_user["username"])
+    page.locator('[data-test="password"]').fill(valid_user["password"])
+    snap("credentials_entered")
+    page.locator('[data-test="login-button"]').click()
+    expect(page).to_have_url(re.compile(r".*/inventory\.html"))
+    snap("inventory_page")
+    return page
