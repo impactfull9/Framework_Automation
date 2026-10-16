@@ -120,3 +120,15 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
         )
     elif report.skipped and report.when == "setup":
         logger.warning("SKIPPED %s", report.nodeid)
+
+
+# -------------- recording screens between runs ----------------
+def pytest_sessionfinish(session : pytest.Session , exitstatus: int) -> None:
+    results_dir = Path(__file__).parent / "test-results"
+    recordings_dir = Path(__file__).parent / "recordings"
+    for video in results_dir/glob("*/video.webm"):
+        recordings_dir.mkdir(exist_ok=True)
+        try:
+            shutil.copy2(video , recordings_dir ,f"{video.parent.name}.webm" )
+        except OSError:
+            pass # file locked!   
