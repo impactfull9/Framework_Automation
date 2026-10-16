@@ -104,3 +104,13 @@ uv sync
 r'''
 uv run playwright install chromium
 '''
+
+# open the recordings folder
+r'''
+explorer recordings
+'''
+
+# list the recordings
+r'''
+Get-ChildItem recordings -Name
+'''
